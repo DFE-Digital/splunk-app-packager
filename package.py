@@ -86,6 +86,9 @@ class SplunkAppInspect:
         auth = HTTPBasicAuth(self.user, self.password)
         auth_res = requests.get(url, auth=auth, timeout=self.timeout)
 
+        if auth_res.status_code != 200:
+            raise Exception(f"Authentication failed: {auth_res.text}")
+        
         self.token = auth_res.json().get("data", {}).get("token")
         self.headers.update(
             {
