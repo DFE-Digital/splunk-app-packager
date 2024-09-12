@@ -5,8 +5,8 @@ from pprint import pprint
 
 
 class SplunkACS:
-    def __init__(self, stack, acs_token, validation_token):
-        self.stack = stack
+    def __init__(self, acs_stack, acs_token, validation_token):
+        self.stack = acs_stack
         self.acs_token = acs_token
         self.validation_token = validation_token
         self.url = f"https://admin.splunk.com/{self.stack}/adminconfig/v2/apps/victoria"

@@ -318,13 +318,6 @@ def render_templates(source, target):
     required=True,
 )
 @click.option(
-    "--splunkstackname",
-    envvar="SPLUNK_STACK_NAME",
-    help="The admin.splunk.com stack name. Can also be set via SPLUNK_STACK_NAME environment variable",
-    type=str,
-    required=True,
-)
-@click.option(
     "--splunkpassword",
     envvar="SPLUNK_PASSWORD",
     help="The splunk.com password. Can also be set via SPLUNK_PASSWORD environment variable",
@@ -362,7 +355,23 @@ def render_templates(source, target):
     required=False,
     default=None,
 )
-def main(app_package, splunkstackname, splunkuser, splunkpassword, justvalidate, outfile, prod, nodeploy):
+@click.option(
+    "--acs-stack",
+    envvar="SPLUNK_ACS_STACK",
+    help="The name of the ACS stack",
+    type=str,
+    required=False,
+    default=None,
+)
+@click.option(
+    "--acs-token",
+    envvar="SPLUNK_ACS_TOKEN",
+    help="A bearer token for Splunk ACS",
+    type=str,
+    required=False,
+    default=None,
+)
+def main(app_package, splunkuser, splunkpassword, justvalidate, outfile, prod, nodeploy, acs_stack, acs_token):
     # All the code relating to Building the Package
     sai = SplunkAppInspect(splunkuser, splunkpassword, packagetargz=outfile)
 
@@ -392,8 +401,13 @@ def main(app_package, splunkstackname, splunkuser, splunkpassword, justvalidate,
 
     # All the code relating to installing the package using Victoria Experience
     if report.report_valid() and not nodeploy:
-        acs_token = os.getenv("SPLUNK_ACS_TOKEN")
-        acs = SplunkACS(splunkstackname, acs_token, sai.token)
+        if not acs_token:
+            print("Unable to deploy! No acs token!")
+            sys.exit(1)
+        if not acs_stack:
+            print("Unable to deploy! No acs stack!")
+            sys.exit(1)
+        acs = SplunkACS(acs_stack, acs_token, sai.token)
 
         # if acs_response:
         success = acs.install_app(sai.packagetargz)
