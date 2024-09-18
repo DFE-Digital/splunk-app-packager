@@ -45,4 +45,4 @@ runs:
         SPLUNK_PASSWORD: ${{ inputs.splunk_password }}
         SPLUNK_ACS_TOKEN: ${{ inputs.splunk_acs_token }}
         SPLUNK_ACS_STACK: ${{ inputs.splunk_acs_stack }}
-      run: ./package.py --prod DCAP
+      run: src/splunk_app_packager/package.py --prod DCAP

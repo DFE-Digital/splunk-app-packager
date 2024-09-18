@@ -17,12 +17,12 @@ from pathlib import Path
 from pathlib import PurePath
 from pprint import pprint
 
-from jinja_replace_dict import REPLACEMENT_DICT
+from splunk_app_packager.jinja_replace_dict import REPLACEMENT_DICT
 import click
 import requests
 from requests.auth import HTTPBasicAuth
 import os
-from acs import SplunkACS
+from splunk_app_packager.acs import SplunkACS
 
 
 class SplunkAppInspectReport:

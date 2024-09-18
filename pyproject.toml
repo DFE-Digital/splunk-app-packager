@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "splunk_app_packager"
+version = "0.0.5"
+authors = [
+  { name="Sam Pritchard", email="sam.pritchard@education.gov.uk" },
+  { name="Ian Pearl", email="ian.pearl@education.gov.uk" },
+  { name="Alex Kinnane", email="alex.kinnane@education.gov.uk"}
+]
+description = "A tool to package up your splunk app and deploy it."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+  "requests",
+  "click",
+  "GitPython",
+  "jinja2"
+]
+
+[project.scripts]
+splunk_app_packager = "splunk_app_packager.package:main"
+
+[project.urls]
+Homepage = "https://github.com/dfe-digital/splunk-app-packager"
+Issues = "https://github.com/dfe-digital/splunk-app-packager/issues"
