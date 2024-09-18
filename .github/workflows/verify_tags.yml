@@ -41,7 +41,7 @@ jobs:
     
       - name: Verify tags
         run: |
-          if [ ${{ steps.git-tag.outputs.new_tag }} == ${{ steps.pyproject-tag.outputs.py_version }}] && [ ${{ steps.pyproject-tag.outputs.py_version }} == ${{ steps.action-tag.outputs.action_version }} ]
+          if [ ${{ steps.git-tag.outputs.new_tag }} == ${{ steps.pyproject-tag.outputs.py_version }} ] && [ ${{ steps.pyproject-tag.outputs.py_version }} == ${{ steps.action-tag.outputs.action_version }} ]
           then
             echo "All tags are equal. Good to release."
             echo "Git Tag: ${{ steps.git-tag.outputs.new_tag }}"
