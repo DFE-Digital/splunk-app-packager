@@ -32,11 +32,14 @@ runs:
         cache: 'pip'
     
     - run: pip install -U setuptools && pip install -r requirements.txt
+      shell: bash
 
     - name: Pip audit
+      shell: bash
       run: pip-audit -S
 
     - name: package, validate, deploy
+      shell: bash
       env:
         SPLUNK_USER: ${{ inputs.splunk_username }}
         SPLUNK_PASSWORD: ${{ inputs.splunk_password }}
