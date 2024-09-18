@@ -4,11 +4,11 @@ build-backend = "hatchling.build"
 
 [project]
 name = "splunk_app_packager"
-version = "0.0.5"
+version = "0.0.6"
 authors = [
-  { name="Sam Pritchard", email="sam.pritchard@education.gov.uk" },
+  { name="Sam Pritchard", email="47423802+pritchyspritch@users.noreply.github.com" },
   { name="Ian Pearl", email="ian.pearl@education.gov.uk" },
-  { name="Alex Kinnane", email="alex.kinnane@education.gov.uk"}
+  { name="Alex Kinnane", email="17098249+akinnane@users.noreply.github.com"}
 ]
 description = "A tool to package up your splunk app and deploy it."
 readme = "README.md"
@@ -22,11 +22,12 @@ dependencies = [
   "requests",
   "click",
   "GitPython",
-  "jinja2"
+  "jinja2",
+  "toml"
 ]
 
 [project.scripts]
-splunk_app_packager = "splunk_app_packager.package:main"
+sap = "splunk_app_packager.package:main"
 
 [project.urls]
 Homepage = "https://github.com/dfe-digital/splunk-app-packager"
