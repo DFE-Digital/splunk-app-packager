@@ -21,6 +21,11 @@ inputs:
     description: The splunk stack.
     required: true
     type: string
+  config_toml_path:
+    description: Path to your config.toml file.
+    required: true
+    type: string
+    default: config.toml
 runs:
   using: composite
   steps:
@@ -42,4 +47,4 @@ runs:
         SPLUNK_PASSWORD: ${{ inputs.splunk_password }}
         SPLUNK_ACS_TOKEN: ${{ inputs.splunk_acs_token }}
         SPLUNK_ACS_STACK: ${{ inputs.splunk_acs_stack }}
-      run: sap --prod ${{ inputs.app_package_path }}
+      run: sap --prod ${{ inputs.app_package_path }} --config-path ${{ inputs.config_toml_path }}
