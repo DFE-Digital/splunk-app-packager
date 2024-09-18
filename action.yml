@@ -33,7 +33,7 @@ runs:
 
     - name: Install splunk-app-packager
       shell: bash
-      run: pip install splunk-app-packager
+      run: pip install splunk-app-packager==0.0.1
 
     - name: package, validate, deploy
       shell: bash
