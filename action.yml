@@ -30,13 +30,10 @@ runs:
         python-version: '3.12.3'
         architecture: 'x64'
         cache: 'pip'
-    
-    - run: pip install -U setuptools && pip install -r requirements.txt
-      shell: bash
 
-    - name: Pip audit
+    - name: Install splunk-app-packager
       shell: bash
-      run: pip-audit -S
+      run: pip install splunk-app-packager
 
     - name: package, validate, deploy
       shell: bash
@@ -45,4 +42,4 @@ runs:
         SPLUNK_PASSWORD: ${{ inputs.splunk_password }}
         SPLUNK_ACS_TOKEN: ${{ inputs.splunk_acs_token }}
         SPLUNK_ACS_STACK: ${{ inputs.splunk_acs_stack }}
-      run: src/splunk_app_packager/package.py --prod DCAP
+      run: sap --prod ${{ inputs.app_package_path }}
