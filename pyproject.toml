@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "splunk_app_packager"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
   { name="Sam Pritchard", email="47423802+pritchyspritch@users.noreply.github.com" },
   { name="Ian Pearl", email="ian.pearl@education.gov.uk" },
