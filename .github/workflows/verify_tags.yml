@@ -41,10 +41,16 @@ jobs:
     
       - name: Verify tags
         run: |
-          if [ ${{ steps.git-tag.outputs.new_tag }} == ${{ steps.pyproject-tag.outputs.py_version }}] && [ ${{ steps.pyproject-tag.outputs.py_version }} == ${{ steps.action-tag.outputs.action_version }}]
+          if [ ${{ steps.git-tag.outputs.new_tag }} == ${{ steps.pyproject-tag.outputs.py_version }}] && [ ${{ steps.pyproject-tag.outputs.py_version }} == ${{ steps.action-tag.outputs.action_version }} ]
           then
-            echo "All tags are equal. Good to release.\nGit Tag: ${{ steps.git-tag.outputs.new_tag }}\npyproject.toml tag: ${{ steps.pyproject-tag.outputs.py_version }}\naction.yml tag: ${{ steps.action-tag.outputs.action_version }}"
+            echo "All tags are equal. Good to release."
+            echo "Git Tag: ${{ steps.git-tag.outputs.new_tag }}"
+            echo "pyproject.toml tag: ${{ steps.pyproject-tag.outputs.py_version }}"
+            echo "action.yml tag: ${{ steps.action-tag.outputs.action_version }}"
           else
-            echo "Tags aren't equal.\nGit Tag: ${{ steps.git-tag.outputs.new_tag }}\npyproject.toml tag: ${{ steps.pyproject-tag.outputs.py_version }}\naction.yml tag: ${{ steps.action-tag.outputs.action_version }}"
+            echo "Tags aren't equal."
+            echo "Git Tag: ${{ steps.git-tag.outputs.new_tag }}"
+            echo "pyproject.toml tag: ${{ steps.pyproject-tag.outputs.py_version }}"
+            echo "action.yml tag: ${{ steps.action-tag.outputs.action_version }}"
             exit 1
           fi
