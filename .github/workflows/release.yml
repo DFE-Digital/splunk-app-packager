@@ -94,7 +94,7 @@ jobs:
           path: dist/
 
       - name: Sign the dists with Sigstore
-        uses: sigstore/gh-action-sigstore-python@v2.1.1
+        uses: sigstore/gh-action-sigstore-python@v3.0.0
         with:
           inputs: >-
             ./dist/*.tar.gz
@@ -111,5 +111,5 @@ jobs:
         # Upload to GitHub Release using the `gh` CLI.
         # `dist/` contains the built packages, and the
         # sigstore-produced signatures and certificates.
-        run: gh release upload '${{ github.ref_name }}' dist/** --repo '${{ github.repository }}'
+        run: gh release upload '${{ needs.tag-release-on-push.outputs.new_tag }}' dist/** --repo '${{ github.repository }}'
     
