@@ -62,3 +62,6 @@ Options:
 ```shell
 $ sap /path/to/app/folder  --prod
 ```
+
+## Contributing
+Refer to [our contributing guidelines](.github/CONTRIBUTING.md) if you'd like to raise a bug or pull request.
