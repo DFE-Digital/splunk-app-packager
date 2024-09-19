@@ -63,5 +63,68 @@ Options:
 $ sap /path/to/app/folder  --prod
 ```
 
+## Use as GitHub Action
+
+### Example production deployment
+
+```yaml
+name: Production Deployment 
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - APP_NAME/**
+  workflow_dispatch:
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dfe-digital/splunk-app-packager@v0.0.2
+        with:
+          app_package_path: 'APP_NAME'
+          splunk_username: ${{ secrets.SPLUNK_USERNAME }}
+          splunk_password: ${{ secrets.SPLUNK_PASSWORD }}
+          splunk_acs_token: ${{ secrets.SPLUNK_ACS_TOKEN }}
+          splunk_acs_stack: ${{ secrets.SPLUNK_ACS_STACK }}
+```
+
+### Example with a different path for config.toml
+
+```yaml
+name: Production Deployment 
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - APP_NAME/**
+  workflow_dispatch:
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dfe-digital/splunk-app-packager@v0.0.2
+        with:
+          app_package_path: 'APP_NAME'
+          splunk_username: ${{ secrets.SPLUNK_USERNAME }}
+          splunk_password: ${{ secrets.SPLUNK_PASSWORD }}
+          splunk_acs_token: ${{ secrets.SPLUNK_ACS_TOKEN }}
+          splunk_acs_stack: ${{ secrets.SPLUNK_ACS_STACK }}
+          config_toml_path: 'conf/config.toml' 
+```
+
 ## Contributing
 Refer to [our contributing guidelines](.github/CONTRIBUTING.md) if you'd like to raise a bug or pull request.

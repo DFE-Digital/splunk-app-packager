@@ -100,10 +100,15 @@ jobs:
             ./dist/*.tar.gz
             ./dist/*.whl
 
-      - name: Create GitHub Release
+      - name: Create GitHub Release for pip/python (0.0.0)
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: gh release create '${{ needs.tag-release-on-push.outputs.new_tag }}' --repo '${{ github.repository }}' --notes ""
+        run: gh release create '${{ needs.tag-release-on-push.outputs.new_tag }}' --repo '${{ github.repository }}' --generate-notes
+
+      - name: Create GitHub Actions Semver Release (v0.0.0)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: gh release create 'v${{ needs.tag-release-on-push.outputs.new_tag }}' --repo '${{ github.repository }}' --notes "GitHub Actions semver release"
 
       - name: Upload artifact signatures to GitHub Release
         env:
