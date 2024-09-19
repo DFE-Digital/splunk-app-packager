@@ -1,0 +1,17 @@
+---
+name: Verify tags are the same
+    
+on:
+  pull_request:
+    # The branches below must be a subset of the branches above
+    types: [opened, reopened]
+    paths-ignore:
+      - 'src/**'
+      - 'pyproject.toml'
+      - 'action.yml'
+jobs:
+  verify-tags:
+    runs-on: ubuntu-latest    
+    steps:
+      - run: echo "No tag checking required required"
+    
