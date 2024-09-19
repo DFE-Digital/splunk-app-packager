@@ -108,7 +108,7 @@ jobs:
       - name: Create GitHub Actions Semver Release (v0.0.0)
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: gh release create 'v${{ needs.tag-release-on-push.outputs.new_tag }}' --repo '${{ github.repository }}' --notes "GitHub Actions semver release"
+        run: gh release create 'v${{ needs.tag-release-on-push.outputs.new_tag }}' --repo '${{ github.repository }}' --notes "GitHub Actions semver release" --latest=false
 
       - name: Upload artifact signatures to GitHub Release
         env:
