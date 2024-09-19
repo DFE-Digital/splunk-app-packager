@@ -1,0 +1,15 @@
+---
+name: "CodeQL"
+    
+on:
+  pull_request:
+    # The branches below must be a subset of the branches above
+    types: [opened, reopened]
+    paths-ignore:
+        - '**.py'
+jobs:
+  run-codeql:
+    runs-on: ubuntu-latest    
+    steps:
+      - run: echo "No CodeQL required"
+    
