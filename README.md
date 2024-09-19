@@ -19,6 +19,19 @@ $ export SPLUNK_ACS_TOKEN=<splunkcloud acs token>
 $ export SPLUNK_ACS_STACK=<splunkcloud acs stack name>
 ```
 
+### Create a config.toml file
+
+Create a `package_config` section within your config.toml file and set the app name and splunk_user name as shown below:
+```
+[package_config]
+app = "NAME"
+environment = ""
+version = ""
+splunk_user = "SPLUNK_APP_ACCOUNT"
+```
+
+splunk_app_packager will look for a `config.toml` file in your current working directory, otherwise you can use the `--config-path` option to specify it's name and location.
+
 ### CLI arguments
 
 ```shell
