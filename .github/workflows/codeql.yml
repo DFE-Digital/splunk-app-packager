@@ -3,9 +3,10 @@ name: "CodeQL"
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "codeql-fix"]
     paths:
       - '*.py'
+      - '.github/codeql-config.yaml'
   pull_request:
     # The branches below must be a subset of the branches above
     types: [opened, reopened]
