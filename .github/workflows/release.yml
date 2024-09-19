@@ -1,0 +1,115 @@
+name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'pyproject.toml'
+      - 'action.yml'
+  
+jobs:
+  tag-release-on-push:
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: write
+    outputs:
+      new_tag: ${{ steps.bump-version.outputs.new_tag }}
+    
+    steps:
+        
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+    
+      - name: Bump version and push tag
+        id: bump-version
+        uses: anothrNick/github-tag-action@1.70.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: false
+          DEFAULT_BUMP: patch
+            
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.3'
+          architecture: 'x64'
+          cache: 'pip'
+    
+      - name: Install pypa/build
+        run: python3 -m pip install build --user
+
+      - name: Build binary wheel and source tarball
+        run: python3 -m build
+
+      - name: Store the packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+  publish-to-pypi:
+    needs: [build]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/splunk-app-packager
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+      - name: Download dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+    
+      - name: Publish distribution 📦 to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+    
+  github-release:
+    needs: [tag-release-on-push, publish-to-pypi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Sign the dists with Sigstore
+        uses: sigstore/gh-action-sigstore-python@v2.1.1
+        with:
+          inputs: >-
+            ./dist/*.tar.gz
+            ./dist/*.whl
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: gh release create '${{ needs.tag-release-on-push.outputs.new_tag }}' --repo '${{ github.repository }}' --notes ""
+
+      - name: Upload artifact signatures to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        # Upload to GitHub Release using the `gh` CLI.
+        # `dist/` contains the built packages, and the
+        # sigstore-produced signatures and certificates.
+        run: gh release upload '${{ github.ref_name }}' dist/** --repo '${{ github.repository }}'
+    

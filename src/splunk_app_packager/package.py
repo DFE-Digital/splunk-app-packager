@@ -8,7 +8,7 @@ import time
 import glob
 import re
 import sys
-from jinja2 import Environment, PackageLoader, select_autoescape, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader
 from git import Repo, InvalidGitRepositoryError
 from copy import deepcopy
 from datetime import datetime
@@ -17,12 +17,11 @@ from pathlib import Path
 from pathlib import PurePath
 from pprint import pprint
 
-from jinja_replace_dict import REPLACEMENT_DICT
+from splunk_app_packager.jinja_replace_dict import load_config_toml
 import click
 import requests
 from requests.auth import HTTPBasicAuth
-import os
-from acs import SplunkACS
+from splunk_app_packager.acs import SplunkACS
 
 
 class SplunkAppInspectReport:
@@ -88,7 +87,7 @@ class SplunkAppInspect:
 
         if auth_res.status_code != 200:
             raise Exception(f"Authentication failed: {auth_res.text}")
-        
+
         self.token = auth_res.json().get("data", {}).get("token")
         self.headers.update(
             {
@@ -225,14 +224,13 @@ class SplunkAppInspect:
             with open(each, "w", encoding="utf8") as target_file:
                 target_file.write(contents)
 
-
     def concat_conf_files(self, app_directory):
         directories = glob.glob(f"{app_directory}/default/*.conf.d/", recursive=True)
         for directory in directories:
             target = open(".".join(directory.split(".")[:-1]), "w")
 
             conf_files = glob.glob(f"{directory}/**/*.conf", recursive=True)
-            #print(conf_files)
+            # print(conf_files)
             for conf_file in conf_files:
                 if ".archive" in conf_file:
                     continue
@@ -244,13 +242,14 @@ class SplunkAppInspect:
             shutil.rmtree(directory)
 
         # IP added as a work around 24/8/2023 for package building the metrics dashboard failing
-        directories = glob.glob(f"{app_directory}/default/**/*.d.archive/", recursive=True)
+        directories = glob.glob(
+            f"{app_directory}/default/**/*.d.archive/", recursive=True
+        )
         for directory in directories:
             try:
                 shutil.rmtree(directory)
             except FileNotFoundError:
                 pass
-
 
     def write_views_files(self, app_directory):
         directories = glob.glob(f"{app_directory}/default/**/*.xml.d/", recursive=True)
@@ -263,11 +262,12 @@ class SplunkAppInspect:
             shutil.rmtree(directory)
 
 
-
-def update_jinja_context(env, app_package):
-    REPLACEMENT_DICT["version"] = git_hash(app_package)
+def update_jinja_context(env, app_package, config_dict):
+    config_dict["version"] = git_hash(app_package)
     # going to be "" for prod, "DEV" for dev. This is probably wrong
-    REPLACEMENT_DICT["environment"] = env
+    config_dict["environment"] = env
+    return config_dict
+
 
 def git_hash(app_package):
     print(app_package)
@@ -281,7 +281,7 @@ def git_hash(app_package):
         except InvalidGitRepositoryError:
             print("App package directory does not contain a .git file")
             p = p.parent
-            if bytes(p) == b'/':
+            if bytes(p) == b"/":
                 break
             print(p)
 
@@ -289,19 +289,23 @@ def git_hash(app_package):
     return head.commit.hexsha
 
 
-def render_templates(source, target):
+def render_templates(source, target, updated_config_dict):
     env = Environment(
         loader=FileSystemLoader(source),
         autoescape=False,
-        )
-    templates = [ template for template in env.list_templates()
-                  if template.endswith(".xml") or template.endswith(".conf") or template.endswith(".json") ]
+    )
+    templates = [
+        template
+        for template in env.list_templates()
+        if template.endswith(".xml")
+        or template.endswith(".conf")
+        or template.endswith(".json")
+    ]
 
     for template in templates:
-        #print(template)
         with open(target + "/" + template, "w", encoding="utf8") as f:
             template_ = env.get_template(template)
-            rendered = template_.render(REPLACEMENT_DICT)
+            rendered = template_.render(updated_config_dict)
             f.write(rendered)
 
 
@@ -358,7 +362,7 @@ def render_templates(source, target):
 @click.option(
     "--acs-stack",
     envvar="SPLUNK_ACS_STACK",
-    help="The name of the ACS stack",
+    help="The name of the ACS stack. Can also be set via SPLUNK_ACS_STACK environment variable.",
     type=str,
     required=False,
     default=None,
@@ -366,12 +370,30 @@ def render_templates(source, target):
 @click.option(
     "--acs-token",
     envvar="SPLUNK_ACS_TOKEN",
-    help="A bearer token for Splunk ACS",
+    help="A bearer token for Splunk ACS. Can also be set via SPLUNK_ACS_TOKEN environment variable.",
     type=str,
     required=False,
     default=None,
 )
-def main(app_package, splunkuser, splunkpassword, justvalidate, outfile, prod, nodeploy, acs_stack, acs_token):
+@click.option(
+    "--config-path",
+    help="A path to the config.toml file.",
+    type=str,
+    required=True,
+    default="config.toml",
+)
+def main(
+    app_package,
+    splunkuser,
+    splunkpassword,
+    justvalidate,
+    outfile,
+    prod,
+    nodeploy,
+    acs_stack,
+    acs_token,
+    config_path,
+):
     # All the code relating to Building the Package
     sai = SplunkAppInspect(splunkuser, splunkpassword, packagetargz=outfile)
 
@@ -383,14 +405,14 @@ def main(app_package, splunkuser, splunkpassword, justvalidate, outfile, prod, n
             suffix = ""
         else:
             suffix = "_DEV"
-        update_jinja_context(suffix, app_package)
-
+        config_dict = load_config_toml(config_path)
+        updated_config_dict = update_jinja_context(suffix, app_package, config_dict)
         app_target = sai.copy_app(app_package, suffix)
-        render_templates(app_package, app_target)
+        render_templates(app_package, app_target, updated_config_dict)
         sai.replace_tripple_quotes(app_target, suffix)
         sai.concat_conf_files(app_target)
         sai.write_views_files(app_target)
-        
+
         report = sai.package_then_validate(app_target)
 
     report = SplunkAppInspectReport(report)

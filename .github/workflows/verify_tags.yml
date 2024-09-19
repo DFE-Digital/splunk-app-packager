@@ -1,0 +1,57 @@
+name: Verify tags are the same
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'pyproject.toml'
+      - 'action.yml'
+
+jobs:
+  verify-tags:
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: read
+    
+    steps:
+      
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '0'
+    
+      - name: Check next git tag
+        id: git-tag
+        uses: anothrNick/github-tag-action@1.70.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: false
+          DEFAULT_BUMP: patch
+          DRY_RUN: true
+
+      - name: Check pyproject tag
+        id: pyproject-tag
+        run: |
+          echo py_version=$(grep version pyproject.toml | cut -d'"' -f2) >> $GITHUB_OUTPUT
+    
+      - name: Check action.yml tag
+        id: action-tag
+        run: |
+          echo action_version=$(grep '==' action.yml | cut -d'=' -f3) >> $GITHUB_OUTPUT
+    
+      - name: Verify tags
+        run: |
+          if [ ${{ steps.git-tag.outputs.new_tag }} == ${{ steps.pyproject-tag.outputs.py_version }} ] && [ ${{ steps.pyproject-tag.outputs.py_version }} == ${{ steps.action-tag.outputs.action_version }} ]
+          then
+            echo "All tags are equal. Good to release."
+            echo "Git Tag: ${{ steps.git-tag.outputs.new_tag }}"
+            echo "pyproject.toml tag: ${{ steps.pyproject-tag.outputs.py_version }}"
+            echo "action.yml tag: ${{ steps.action-tag.outputs.action_version }}"
+          else
+            echo "Tags aren't equal."
+            echo "Git Tag: ${{ steps.git-tag.outputs.new_tag }}"
+            echo "pyproject.toml tag: ${{ steps.pyproject-tag.outputs.py_version }}"
+            echo "action.yml tag: ${{ steps.action-tag.outputs.action_version }}"
+            exit 1
+          fi

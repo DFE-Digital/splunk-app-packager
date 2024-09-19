@@ -1,0 +1,29 @@
+---
+name: "CodeQL"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - '*.py'
+  pull_request:
+    # The branches below must be a subset of the branches above
+    types: [opened, reopened]
+    paths:
+        - '**.py'
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+jobs:
+
+  run-codeql:
+    uses: DFE-Digital/github-actions/.github/workflows/reusable-workflow-sast.yml@master
+    with:
+        language: 'python'
+        policy_action: 'break'
+        queries: 'security-extended'
+        config_file: '.github/codeql-config.yaml'
+    secrets:
+        CODEQL_APP_ID: ${{ secrets.CODEQL_APP_ID }}
+        CODEQL_AUTHENTICATION_PRIVATE_KEY: ${{ secrets.CODEQL_AUTHENTICATION_PRIVATE_KEY }}

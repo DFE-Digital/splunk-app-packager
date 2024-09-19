@@ -1,0 +1,13 @@
+--
+paths-ignore:
+  - .github
+query-filters:
+  - exclude:
+      problems.severity:
+        - Note  # ignore notes when there's too much noise
+queries:
+  - uses: security-experimental
+  - uses: security-extended
+  - uses: security-and-quality
+  - uses: advanced-security/codeql-queries/python/suites/codeql-python.qls@main
+  - uses: advanced-security/codeql-queries/javascript/suites/codeql-javascript.qls@main
