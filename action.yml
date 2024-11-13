@@ -26,6 +26,11 @@ inputs:
     required: true
     type: string
     default: config.toml
+  production:
+    description: Boolean stating you would like to push to production
+    required: false
+    type: boolean
+    default: true
 runs:
   using: composite
   steps:
@@ -40,7 +45,7 @@ runs:
       shell: bash
       run: pip install splunk-app-packager==0.0.2
 
-    - name: package, validate, deploy
+    - name: package, validate, deploy (production)
       shell: bash
       env:
         SPLUNK_USER: ${{ inputs.splunk_username }}
@@ -48,3 +53,16 @@ runs:
         SPLUNK_ACS_TOKEN: ${{ inputs.splunk_acs_token }}
         SPLUNK_ACS_STACK: ${{ inputs.splunk_acs_stack }}
       run: sap --prod ${{ inputs.app_package_path }} --config-path ${{ inputs.config_toml_path }}
+      if: ${{ inputs.production == true }}
+
+
+    - name: package, validate, deploy (production)
+      shell: bash
+      env:
+        SPLUNK_USER: ${{ inputs.splunk_username }}
+        SPLUNK_PASSWORD: ${{ inputs.splunk_password }}
+        SPLUNK_ACS_TOKEN: ${{ inputs.splunk_acs_token }}
+        SPLUNK_ACS_STACK: ${{ inputs.splunk_acs_stack }}
+      run: sap ${{ inputs.app_package_path }} --config-path ${{ inputs.config_toml_path }}
+      if: ${{ inputs.production == false }}
+    
