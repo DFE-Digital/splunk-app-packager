@@ -38,7 +38,7 @@ jobs:
       - name: Check action.yml tag
         id: action-tag
         run: |
-          echo action_version=$(grep '==' action.yml | cut -d'=' -f3) >> $GITHUB_OUTPUT
+          echo action_version=$(grep 'packager==' action.yml | cut -d'=' -f3) >> $GITHUB_OUTPUT
     
       - name: Verify tags
         run: |
