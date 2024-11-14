@@ -56,7 +56,7 @@ runs:
       if: ${{ inputs.production == true }}
 
 
-    - name: package, validate, deploy (production)
+    - name: package, validate, deploy (development)
       shell: bash
       env:
         SPLUNK_USER: ${{ inputs.splunk_username }}
