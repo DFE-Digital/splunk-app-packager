@@ -27,10 +27,10 @@ inputs:
     type: string
     default: config.toml
   production:
-    description: Boolean stating you would like to push to production
+    description: String stating a boolean value you would like to push to production (booleans and types are not supported)
     required: false
-    type: boolean
-    default: true
+    type: string
+    default: 'true'
 runs:
   using: composite
   steps:
@@ -53,7 +53,7 @@ runs:
         SPLUNK_ACS_TOKEN: ${{ inputs.splunk_acs_token }}
         SPLUNK_ACS_STACK: ${{ inputs.splunk_acs_stack }}
       run: sap --prod ${{ inputs.app_package_path }} --config-path ${{ inputs.config_toml_path }}
-      if: ${{ inputs.production == true }}
+      if: ${{ inputs.production == 'true' }}
 
 
     - name: package, validate, deploy (development)
@@ -64,5 +64,5 @@ runs:
         SPLUNK_ACS_TOKEN: ${{ inputs.splunk_acs_token }}
         SPLUNK_ACS_STACK: ${{ inputs.splunk_acs_stack }}
       run: sap ${{ inputs.app_package_path }} --config-path ${{ inputs.config_toml_path }}
-      if: ${{ inputs.production == false }}
+      if: ${{ inputs.production == 'false' }}
     
