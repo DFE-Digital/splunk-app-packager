@@ -300,6 +300,7 @@ def render_templates(source, target, updated_config_dict):
         if template.endswith(".xml")
         or template.endswith(".conf")
         or template.endswith(".json")
+        or template.endswith(".meta")
     ]
 
     for template in templates:
